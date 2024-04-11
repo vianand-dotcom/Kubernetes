@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-app3
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: hello3
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: hello3
+    spec:
+      containers:
+        - name: hello
+          image: "httpd"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-service3
+  namespace: dev
+  labels:
+    app: hello3
+spec:
+  type: ClusterIP
+  selector:
+    app: hello3
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress3
+  namespace: dev
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "neuralnet.co.in"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/app3"
+            backend:
+              service:
+                name: hello-service3
+                port:
+                  number: 80
